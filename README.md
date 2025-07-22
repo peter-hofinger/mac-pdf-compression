@@ -5,13 +5,16 @@ A command-line tool for compressing PDF files on macOS using the **Reduce File S
 ## Prerequisites
 
 - macOS (required for Quartz filter support)
+- [git](https://git-scm.com/downloads/mac)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager
 
 ## Installation
 
-Install all dependencies using uv:
+Clone the repository with git and install all dependencies using uv:
 
 ```bash
+git clone https://github.com/peter-hofinger/mac-pdf-compression.git
+cd mac-pdf-compression
 uv sync --compile-bytecode
 ```
 
@@ -23,7 +26,7 @@ uv sync --compile-bytecode
 uv run main.py <file_or_directory>
 ```
 
-The tool accepts either a single PDF file or a directory path. When given a directory, it recursively processes all PDF files found within.
+The tool accepts either a single PDF file or a directory path. When given a directory, it processes all PDF files found in this directory. It starts with the largest file sizes, so the estimated time remaining will be overestimated.
 
 ### Single File Compression
 
@@ -41,7 +44,7 @@ Compressed 1 PDF by 55.56% to 2.597 MiB
 
 ### Batch Directory Processing
 
-Process all PDFs in a directory (including subdirectories):
+Process all PDFs in a directory (including subdirectories!):
 
 ```bash
 uv run main.py documents/
