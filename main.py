@@ -24,13 +24,17 @@ def _sanity_check():
 
 
 def _find_pdfs(path):
-    pdfs = [Path(path) for path in glob(expanduser("**/*.pdf"), recursive=True)]
+    pdfs = [Path(path) for path in glob(expanduser(path), recursive=True)]
 
     invalid_paths = [
         p for p in pdfs if not (p.exists() and p.is_file() and p.suffix == ".pdf")
     ]
     if invalid_paths:
         raise ValueError(f"Resolved following invalid paths: {invalid_paths}")
+
+    if len(pdfs) == 0:
+        f"No PDFs found for {path}"
+        raise ValueError(f"No PDFs found in {path}")
 
     tuples = sorted(((pdf.stat().st_size, pdf) for pdf in pdfs), reverse=True)
     sizes, pdfs = zip(*tuples)
@@ -49,6 +53,7 @@ def _human_readable(size, precision=4):
 
 
 def _compress(pdfs, sizes):
+    n_pdfs = len(pdfs)
     total_size = sum(sizes)
     if n_pdfs == 1:
         print(f"Found 1 PDF with {_human_readable(total_size)}")
@@ -75,12 +80,6 @@ def _compress(pdfs, sizes):
 if __name__ == "__main__":
     _sanity_check()
 
-    path = argv[1]
-    pdfs, sizes = _find_pdfs(path)
-
-    n_pdfs = len(pdfs)
-    if n_pdfs == 0:
-        f"No PDFs found for {path}"
-        raise ValueError(f"No PDFs found in {path}")
+    pdfs, sizes = _find_pdfs(argv[1])
 
     _compress(pdfs, sizes)
