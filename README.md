@@ -23,7 +23,7 @@ uv sync
 ### Basic Syntax
 
 ```bash
-uv run main.py /pattern/with/wildcards.pdf
+uv run main.py "/pattern/with/wildcards.pdf"
 ```
 
 The tool accepts any path and supports [wildcards](https://docs.python.org/3/library/pathlib.html#pathlib-pattern-language). If the given pattern resolves to existing PDF files, it processes all of them Largest files are processed first, so the estimated time remaining will be overestimated.
@@ -33,7 +33,7 @@ The tool accepts any path and supports [wildcards](https://docs.python.org/3/lib
 Compress an individual PDF document:
 
 ```bash
-uv run main.py document.pdf
+uv run main.py "document.pdf"
 ```
 
 **Example output:**
@@ -47,7 +47,7 @@ Compressed 1 PDF by 55.56% to 2.597 MiB
 Process all PDFs in a directory, including subdirectories:
 
 ```bash
-uv run main.py ~/Downloads/**/*.pdf
+uv run main.py "~/Downloads/**/*.pdf"
 ```
 
 **Example output:**
