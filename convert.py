@@ -1,10 +1,28 @@
-import os
 import tempfile
 from pathlib import Path
+from shutil import copymode, copystat
 from sys import argv
 
 from Foundation import NSURL
+from osxmetadata import ALL_ATTRIBUTES, OSXMetaData
 from Quartz import PDFDocument, QuartzFilter
+
+
+def _get_metadata(filepath):
+    metadata = OSXMetaData(filepath)
+    result = {}
+    for attr in ALL_ATTRIBUTES:
+        value = metadata.get(attr)
+        if value is not None:
+            result[attr] = value
+
+    return result
+
+
+def _set_metadata(filepath, metadata):
+    dest_md = OSXMetaData(filepath)
+    for attr, value in metadata.items():
+        dest_md.set(attr, value)
 
 
 def _compress_pdf(filepath):
@@ -19,22 +37,22 @@ def _compress_pdf(filepath):
 
 
 def _atomic_modify(filepath, new_content):
-    stat = filepath.stat()
-    if stat.st_size <= len(new_content):
-        return
+    if filepath.stat().st_size <= len(new_content):
+        return  # Quartz filter did not decrease file size
 
+    metadata = _get_metadata(filepath)
     with tempfile.NamedTemporaryFile(
-        prefix=filepath.name + ".", dir=filepath.resolve().parent
+        prefix=filepath.name + ".", dir=filepath.parent
     ) as tmp:
         tmp_path = Path(tmp.name)
 
         tmp_path.write_bytes(new_content)
-        tmp_path = tmp_path.replace(filepath)  # atomic rename
+        copymode(filepath, tmp_path)
+        copystat(filepath, tmp_path)
+        _set_metadata(tmp_path, metadata)
+        tmp_path = tmp_path.replace(filepath)  # Atomic rename
 
         Path(tmp.name).touch()  # Context manager expects a file
-
-    tmp_path.chmod(stat.st_mode)
-    os.chown(tmp_path, stat.st_uid, stat.st_gid)
 
 
 if __name__ == "__main__":
@@ -42,7 +60,7 @@ if __name__ == "__main__":
         msg = f"You passed {len(argv) - 1} arguments although 1 was expected."
         raise RuntimeError(msg)
 
-    filepath = Path(argv[1])
+    filepath = Path(argv[1]).resolve()
     if not filepath.exists():
         msg = f"File {filepath} does not exist."
         raise ValueError(msg)

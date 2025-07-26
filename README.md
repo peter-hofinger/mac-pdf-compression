@@ -1,12 +1,12 @@
 # Mac PDF Compression
 
-A command-line tool for compressing PDF files on macOS using the **Reduce File Size** Quartz filter. It prevents corruption with atomic file operations and supports both individual files and batch processing of directories.
+A command-line tool for compressing PDF files on macOS using the **Reduce File Size** Quartz filter. It prevents corruption with atomic file operations and keeps metadata.
 
 ## Prerequisites
 
-- macOS (required for Quartz filter support)
+- [macOS](https://www.apple.com/macos)
 - [git](https://git-scm.com/downloads/mac)
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ## Installation
 
@@ -15,7 +15,7 @@ Clone the repository with git and install all dependencies using uv:
 ```bash
 git clone https://github.com/peter-hofinger/mac-pdf-compression.git
 cd mac-pdf-compression
-uv sync --compile-bytecode
+uv sync
 ```
 
 ## Usage
@@ -23,10 +23,10 @@ uv sync --compile-bytecode
 ### Basic Syntax
 
 ```bash
-uv run main.py <file_or_directory>
+uv run main.py /pattern/with/wildcards.pdf
 ```
 
-The tool accepts either a single PDF file or a directory path. When given a directory, it processes all PDF files found in this directory. It starts with the largest file sizes, so the estimated time remaining will be overestimated.
+The tool accepts any path and supports [wildcards](https://docs.python.org/3/library/pathlib.html#pathlib-pattern-language). If the given pattern resolves to existing PDF files, it processes all of them Largest files are processed first, so the estimated time remaining will be overestimated.
 
 ### Single File Compression
 
@@ -42,12 +42,12 @@ Found 1 PDF with 5.844 MiB
 Compressed 1 PDF by 55.56% to 2.597 MiB
 ```
 
-### Batch Directory Processing
+### Batch Processing
 
-Process all PDFs in a directory (including subdirectories!):
+Process all PDFs in a directory, including subdirectories:
 
 ```bash
-uv run main.py documents/
+uv run main.py ~/Downloads/**/*.pdf
 ```
 
 **Example output:**
